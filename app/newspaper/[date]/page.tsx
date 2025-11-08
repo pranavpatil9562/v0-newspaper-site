@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: PageProps) {
   const { date } = await params
 
   return {
-    title: `Daily Times - ${date}`,
-    description: `Daily Times newspaper from ${date}`,
+    title: `MANIKYADA MINCHU - ${date}`,
+    description: `MANIKYADA MINCHU newspaper from ${date}`,
   }
 }
 
@@ -72,7 +72,7 @@ export default async function NewspaperPage({ params }: PageProps) {
 
       <footer className="border-t py-6 mt-12">
         <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Daily Times. All rights reserved.</p>
+          <p>&copy; 2025 MANIKYADA MINCHU. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -13,7 +13,7 @@ export default async function ArchivePage() {
       <header className="sticky top-0 z-50 border-b bg-background">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Daily Times</h1>
+            <h1 className="text-3xl font-bold">MANIKYADA MINCHU</h1>
             <p className="text-sm text-muted-foreground">Archive</p>
           </div>
           <div className="flex gap-2">
@@ -68,7 +68,7 @@ export default async function ArchivePage() {
 
       <footer className="border-t py-6 mt-12">
         <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 Daily Times. All rights reserved.</p>
+          <p>&copy; 2025 MANIKYADA MINCHU. All rights reserved.</p>
         </div>
       </footer>
     </div>

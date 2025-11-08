@@ -174,7 +174,7 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
                   <Input
                     id="title"
                     type="text"
-                    placeholder="e.g., Daily Times - Nov 8, 2025"
+                    placeholder="e.g., MANIKYADA MINCHU - Nov 8, 2025"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
