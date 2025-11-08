@@ -30,7 +30,7 @@ export default async function HomePage() {
       <header className="sticky top-0 z-50 border-b bg-background">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">MANIKAYDA MINCHU</h1>
+            <h1 className="text-3xl font-bold">MANIKYADA MINCHU</h1>
             <div className="flex items-center gap-4 mt-2">
               <p className="text-sm text-muted-foreground">Editor: MANIKESH PATIL</p>
               <span className="text-sm text-muted-foreground">•</span>

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface NewspaperGalleryProps {
@@ -12,7 +12,9 @@ interface NewspaperGalleryProps {
 export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
+  const [zoom, setZoom] = useState(1) // Added zoom state
   const containerRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -24,6 +26,10 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
       document.removeEventListener("fullscreenchange", handleFullscreenChange)
     }
   }, [])
+
+  useEffect(() => {
+    setZoom(1)
+  }, [currentIndex])
 
   if (!images || images.length === 0) {
     return (
@@ -39,6 +45,14 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
 
   const goToNext = () => {
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.25, 3))
+  }
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.25, 1))
   }
 
   const toggleFullscreen = async () => {
@@ -68,15 +82,23 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
             fullscreen ? "fixed inset-0 z-50 aspect-auto rounded-none" : "rounded-lg aspect-[8.5/11]"
           }`}
         >
-          {images[currentIndex] && (
-            <Image
-              src={images[currentIndex] || "/placeholder.svg"}
-              alt={`Newspaper page ${currentIndex + 1}`}
-              fill
-              className="object-contain"
-              priority
-            />
-          )}
+          <div
+            ref={imageRef}
+            className={`relative w-full h-full flex items-center justify-center transition-transform duration-200 ${
+              fullscreen && zoom > 1 ? "overflow-auto" : "overflow-hidden"
+            }`}
+            style={{ transform: `scale(${zoom})`, transformOrigin: "center center" }}
+          >
+            {images[currentIndex] && (
+              <Image
+                src={images[currentIndex] || "/placeholder.svg"}
+                alt={`Newspaper page ${currentIndex + 1}`}
+                fill
+                className="object-contain"
+                priority
+              />
+            )}
+          </div>
 
           {fullscreen && (
             <>
@@ -106,6 +128,33 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
               >
                 <Minimize2 className="w-6 h-6" />
               </Button>
+
+              <div className="absolute top-4 left-4 flex gap-2 bg-black/50 rounded-lg p-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleZoomOut}
+                  disabled={zoom <= 1}
+                  className="text-white hover:bg-black/70 h-9 w-9"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-5 h-5" />
+                </Button>
+                <div className="flex items-center justify-center px-3 text-white text-sm font-medium min-w-12">
+                  {Math.round(zoom * 100)}%
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleZoomIn}
+                  disabled={zoom >= 3}
+                  className="text-white hover:bg-black/70 h-9 w-9"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </Button>
+              </div>
+
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
                 Page {currentIndex + 1} of {images.length}
               </div>
