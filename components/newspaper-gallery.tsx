@@ -50,9 +50,16 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDraggingRef.current && zoom > 1) {
-      const newPanX = e.clientX - dragStartRef.current.x
-      const newPanY = e.clientY - dragStartRef.current.y
+    if (isDraggingRef.current && zoom > 1 && containerRef.current) {
+      const maxPanX = (containerRef.current.clientWidth * (zoom - 1)) / 2
+      const maxPanY = (containerRef.current.clientHeight * (zoom - 1)) / 2
+
+      let newPanX = e.clientX - dragStartRef.current.x
+      let newPanY = e.clientY - dragStartRef.current.y
+
+      newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX))
+      newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY))
+
       setPanX(newPanX)
       setPanY(newPanY)
     }
@@ -82,11 +89,18 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
       const distance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY)
 
       const scale = distance / touchStartDistanceRef.current
-      const newZoom = touchStartZoomRef.current * scale
-      setZoom(Math.min(Math.max(newZoom, 1), 3))
-    } else if (isDraggingRef.current && zoom > 1 && e.touches.length === 1) {
-      const newPanX = e.touches[0].clientX - dragStartRef.current.x
-      const newPanY = e.touches[0].clientY - dragStartRef.current.y
+      const newZoom = Math.min(Math.max(touchStartZoomRef.current * scale, 1), 3)
+      setZoom(newZoom)
+    } else if (isDraggingRef.current && zoom > 1 && e.touches.length === 1 && containerRef.current) {
+      const maxPanX = (containerRef.current.clientWidth * (zoom - 1)) / 2
+      const maxPanY = (containerRef.current.clientHeight * (zoom - 1)) / 2
+
+      let newPanX = e.touches[0].clientX - dragStartRef.current.x
+      let newPanY = e.touches[0].clientY - dragStartRef.current.y
+
+      newPanX = Math.max(-maxPanX, Math.min(maxPanX, newPanX))
+      newPanY = Math.max(-maxPanY, Math.min(maxPanY, newPanY))
+
       setPanX(newPanX)
       setPanY(newPanY)
     }
@@ -105,11 +119,11 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   }
 
   const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 0.25, 3))
+    setZoom((prev) => Math.min(prev + 0.5, 3))
   }
 
   const handleZoomOut = () => {
-    setZoom((prev) => Math.max(prev - 0.25, 1))
+    setZoom((prev) => Math.max(prev - 0.5, 1))
   }
 
   const toggleFullscreen = async () => {
@@ -148,12 +162,16 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
         >
           <div
             ref={imageRef}
-            className={`relative w-full h-full flex items-center justify-center transition-transform duration-200 ${
+            className={`relative w-full h-full flex items-center justify-center ${
               zoom > 1 ? "overflow-hidden" : "overflow-hidden"
             }`}
             style={{
               transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
               transformOrigin: "center center",
+              transition:
+                isDraggingRef.current || touchStartDistanceRef.current > 0
+                  ? "none"
+                  : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             {images[currentIndex] && (
