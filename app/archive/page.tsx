@@ -20,11 +20,6 @@ export default async function ArchivePage() {
             <Link href="/">
               <Button variant="ghost">Home</Button>
             </Link>
-            <Link href="/admin/login">
-              <Button variant="ghost" size="sm">
-                Admin
-              </Button>
-            </Link>
           </div>
         </div>
       </header>

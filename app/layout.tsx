@@ -8,8 +8,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Daily Times - Newspaper",
-  description: "Read the latest daily newspaper online",
+  title: "MANIKAYDA MINCHU - Newspaper",
+  description: "Read the latest daily newspaper online. Editor: MANIKESH PATIL",
   generator: "v0.app",
   icons: {
     icon: [

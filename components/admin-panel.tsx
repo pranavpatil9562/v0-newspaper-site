@@ -66,19 +66,26 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
         const fileName = `${date}_${i + 1}_${Date.now()}.jpg`
         const path = `newspapers/${date}/${fileName}`
 
+        console.log("[v0] Uploading file:", { fileName, path, fileSize: file.size, fileType: file.type })
+
         const { data, error: uploadError } = await supabase.storage
           .from("newspapers")
           .upload(path, file, { upsert: false })
 
         if (uploadError) {
+          console.log("[v0] Upload error details:", uploadError)
           throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`)
         }
+
+        console.log("[v0] File uploaded successfully:", data)
 
         // Get public URL
         const { data: publicUrl } = supabase.storage.from("newspapers").getPublicUrl(data.path)
 
         imageUrls.push(publicUrl.publicUrl)
       }
+
+      console.log("[v0] All files uploaded, saving to database...")
 
       // Check if newspaper already exists for this date
       const { data: existingNewspaper, error: checkError } = await supabase
@@ -90,6 +97,7 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
       let dbError
       if (checkError?.code === "PGRST116") {
         // No existing newspaper, create new one
+        console.log("[v0] Creating new newspaper record")
         const { error } = await supabase.from("newspapers").insert({
           date,
           title,
@@ -98,6 +106,7 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
         dbError = error
       } else if (!checkError) {
         // Newspaper exists, append images
+        console.log("[v0] Updating existing newspaper record")
         const updatedUrls = [...(existingNewspaper.image_urls || []), ...imageUrls]
         const { error } = await supabase
           .from("newspapers")
@@ -108,17 +117,24 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
           .eq("date", date)
         dbError = error
       } else {
+        console.log("[v0] Database check error:", checkError)
         throw checkError
       }
 
-      if (dbError) throw dbError
+      if (dbError) {
+        console.log("[v0] Database error:", dbError)
+        throw dbError
+      }
 
+      console.log("[v0] Upload successful!")
       setSuccess(`Successfully uploaded ${files.length} image(s) for ${date}`)
       setTitle("")
       setDate(new Date().toISOString().split("T")[0])
       setFiles([])
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      const errorMessage = err instanceof Error ? err.message : "An error occurred"
+      console.log("[v0] Final error:", errorMessage)
+      setError(errorMessage)
     } finally {
       setUploading(false)
     }
