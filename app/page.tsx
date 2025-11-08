@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getLatestNewspaper } from "@/lib/supabase/newspapers"
 import { Button } from "@/components/ui/button"
 import NewspaperGallery from "@/components/newspaper-gallery"
+import NewspaperHeader from "@/components/newspaper-header"
 
 export const revalidate = 3600 // Revalidate every hour
 
@@ -11,9 +12,10 @@ export default async function HomePage() {
   if (!newspaper) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-6">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-balance">MANIKAYDA MINCHU</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Editor: MANIKESH PATIL</p>
+        <div className="w-full max-w-6xl">
+          <NewspaperHeader />
+        </div>
+        <div className="text-center mt-12">
           <p className="mt-4 text-lg text-muted-foreground">No newspaper published yet. Check back soon!</p>
           <div className="flex gap-4 justify-center mt-8">
             <Link href="/archive">
@@ -27,29 +29,21 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-50 border-b bg-background">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">MANIKYADA MINCHU</h1>
-            <div className="flex items-center gap-4 mt-2">
-              <p className="text-sm text-muted-foreground">Editor: MANIKESH PATIL</p>
-              <span className="text-sm text-muted-foreground">•</span>
-              <p className="text-sm text-muted-foreground">
-                Published on{" "}
-                {new Date(newspaper.date).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/archive">
-              <Button variant="ghost">Archive</Button>
-            </Link>
-          </div>
+      <NewspaperHeader />
+
+      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {new Date(newspaper.date).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+          <Link href="/archive">
+            <Button variant="ghost">Archive</Button>
+          </Link>
         </div>
       </header>
 
@@ -61,9 +55,15 @@ export default async function HomePage() {
       </main>
 
       <footer className="border-t py-6 mt-12">
-        <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 MANIKAYDA MINCHU. All rights reserved.</p>
-          <p className="mt-2 text-xs">Editor: MANIKESH PATIL</p>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 gap-8 text-center">
+            <div className="border-r border-foreground/20 pr-8">
+              <p className="text-xs text-muted-foreground">© 2025 MANIKYADA MINCHU</p>
+            </div>
+            <div className="pl-8">
+              <p className="text-xs text-muted-foreground">© 2025 ಮಣಿಕ್ಯದ ಮಿಂಚು</p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
