@@ -130,19 +130,26 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
     if (!containerRef.current) return
 
     try {
-      if (!document.fullscreenElement) {
-        if (containerRef.current.requestFullscreen) {
+      // Check if fullscreen API is supported
+      if (containerRef.current.requestFullscreen) {
+        if (!document.fullscreenElement) {
           await containerRef.current.requestFullscreen().catch((error) => {
             console.error("Fullscreen request failed:", error)
+            // Fallback to modal fullscreen on iOS
+            setFullscreen(true)
+          })
+        } else {
+          await document.exitFullscreen().catch((error) => {
+            console.error("Fullscreen exit failed:", error)
           })
         }
       } else {
-        await document.exitFullscreen().catch((error) => {
-          console.error("Fullscreen exit failed:", error)
-        })
+        setFullscreen(!fullscreen)
       }
     } catch (error) {
       console.error("Fullscreen error:", error)
+      // Fallback to modal fullscreen
+      setFullscreen(!fullscreen)
     }
   }
 
@@ -152,7 +159,7 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
         <div
           ref={containerRef}
           className={`relative bg-muted overflow-hidden flex items-center justify-center cursor-${zoom > 1 ? "grab" : "default"} active:cursor-grabbing ${
-            fullscreen ? "fixed inset-0 z-50 aspect-auto rounded-none" : "rounded-lg aspect-[8.5/11]"
+            fullscreen ? "fixed inset-0 z-50 aspect-auto rounded-none w-screen h-screen" : "rounded-lg aspect-[8.5/11]"
           }`}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -212,7 +219,7 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
                 variant="ghost"
                 size="icon"
                 onClick={toggleFullscreen}
-                className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white"
+                className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white z-10"
               >
                 <Minimize2 className="w-6 h-6" />
               </Button>
