@@ -14,9 +14,14 @@ export default async function HomePage() {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-balance">Daily Times</h1>
           <p className="mt-4 text-lg text-muted-foreground">No newspaper published yet. Check back soon!</p>
-          <Link href="/archive" className="mt-8">
-            <Button variant="outline">View Archive</Button>
-          </Link>
+          <div className="flex gap-4 justify-center mt-8">
+            <Link href="/archive">
+              <Button variant="outline">View Archive</Button>
+            </Link>
+            <Link href="/admin/login">
+              <Button variant="ghost">Admin</Button>
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -38,9 +43,16 @@ export default async function HomePage() {
               })}
             </p>
           </div>
-          <Link href="/archive">
-            <Button variant="ghost">Archive</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/archive">
+              <Button variant="ghost">Archive</Button>
+            </Link>
+            <Link href="/admin/login">
+              <Button variant="ghost" size="sm">
+                Admin
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 

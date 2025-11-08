@@ -16,9 +16,16 @@ export default async function ArchivePage() {
             <h1 className="text-3xl font-bold">Daily Times</h1>
             <p className="text-sm text-muted-foreground">Archive</p>
           </div>
-          <Link href="/">
-            <Button variant="ghost">Home</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/">
+              <Button variant="ghost">Home</Button>
+            </Link>
+            <Link href="/admin/login">
+              <Button variant="ghost" size="sm">
+                Admin
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
