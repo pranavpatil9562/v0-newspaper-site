@@ -15,10 +15,14 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
   const [zoom, setZoom] = useState(1)
+  const [panX, setPanX] = useState(0)
+  const [panY, setPanY] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
   const touchStartDistanceRef = useRef(0)
   const touchStartZoomRef = useRef(1)
+  const dragStartRef = useRef({ x: 0, y: 0 })
+  const isDraggingRef = useRef(false)
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -33,7 +37,30 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
 
   useEffect(() => {
     setZoom(1)
+    setPanX(0)
+    setPanY(0)
   }, [currentIndex])
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (zoom > 1) {
+      isDraggingRef.current = true
+      dragStartRef.current = { x: e.clientX - panX, y: e.clientY - panY }
+      e.preventDefault()
+    }
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDraggingRef.current && zoom > 1) {
+      const newPanX = e.clientX - dragStartRef.current.x
+      const newPanY = e.clientY - dragStartRef.current.y
+      setPanX(newPanX)
+      setPanY(newPanY)
+    }
+  }
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false
+  }
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 2) {
@@ -42,6 +69,9 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
       const distance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY)
       touchStartDistanceRef.current = distance
       touchStartZoomRef.current = zoom
+    } else if (e.touches.length === 1 && zoom > 1) {
+      isDraggingRef.current = true
+      dragStartRef.current = { x: e.touches[0].clientX - panX, y: e.touches[0].clientY - panY }
     }
   }
 
@@ -54,15 +84,16 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
       const scale = distance / touchStartDistanceRef.current
       const newZoom = touchStartZoomRef.current * scale
       setZoom(Math.min(Math.max(newZoom, 1), 3))
+    } else if (isDraggingRef.current && zoom > 1 && e.touches.length === 1) {
+      const newPanX = e.touches[0].clientX - dragStartRef.current.x
+      const newPanY = e.touches[0].clientY - dragStartRef.current.y
+      setPanX(newPanX)
+      setPanY(newPanY)
     }
   }
 
-  if (!images || images.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-96 bg-muted rounded-lg">
-        <p className="text-muted-foreground">No images available</p>
-      </div>
-    )
+  const handleTouchEnd = () => {
+    isDraggingRef.current = false
   }
 
   const goToPrevious = () => {
@@ -104,26 +135,35 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
       <div className="space-y-4">
         <div
           ref={containerRef}
-          className={`relative bg-muted overflow-hidden flex items-center justify-center ${
+          className={`relative bg-muted overflow-hidden flex items-center justify-center cursor-${zoom > 1 ? "grab" : "default"} active:cursor-grabbing ${
             fullscreen ? "fixed inset-0 z-50 aspect-auto rounded-none" : "rounded-lg aspect-[8.5/11]"
           }`}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
         >
           <div
             ref={imageRef}
             className={`relative w-full h-full flex items-center justify-center transition-transform duration-200 ${
-              fullscreen && zoom > 1 ? "overflow-auto" : "overflow-hidden"
+              zoom > 1 ? "overflow-hidden" : "overflow-hidden"
             }`}
-            style={{ transform: `scale(${zoom})`, transformOrigin: "center center" }}
+            style={{
+              transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
+              transformOrigin: "center center",
+            }}
           >
             {images[currentIndex] && (
               <Image
                 src={images[currentIndex] || "/placeholder.svg"}
                 alt={`Newspaper page ${currentIndex + 1}`}
                 fill
-                className="object-contain"
+                className="object-contain select-none"
                 priority
+                draggable={false}
               />
             )}
           </div>
