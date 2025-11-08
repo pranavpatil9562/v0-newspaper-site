@@ -130,14 +130,16 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
     if (!containerRef.current) return
 
     try {
-      if (!fullscreen) {
+      if (!document.fullscreenElement) {
         if (containerRef.current.requestFullscreen) {
-          await containerRef.current.requestFullscreen()
+          await containerRef.current.requestFullscreen().catch((error) => {
+            console.error("Fullscreen request failed:", error)
+          })
         }
       } else {
-        if (document.fullscreenElement) {
-          await document.exitFullscreen()
-        }
+        await document.exitFullscreen().catch((error) => {
+          console.error("Fullscreen exit failed:", error)
+        })
       }
     } catch (error) {
       console.error("Fullscreen error:", error)
