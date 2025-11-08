@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react"
@@ -12,9 +14,11 @@ interface NewspaperGalleryProps {
 export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
-  const [zoom, setZoom] = useState(1) // Added zoom state
+  const [zoom, setZoom] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
+  const touchStartDistanceRef = useRef(0)
+  const touchStartZoomRef = useRef(1)
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -30,6 +34,28 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   useEffect(() => {
     setZoom(1)
   }, [currentIndex])
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const distance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY)
+      touchStartDistanceRef.current = distance
+      touchStartZoomRef.current = zoom
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const distance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY)
+
+      const scale = distance / touchStartDistanceRef.current
+      const newZoom = touchStartZoomRef.current * scale
+      setZoom(Math.min(Math.max(newZoom, 1), 3))
+    }
+  }
 
   if (!images || images.length === 0) {
     return (
@@ -81,6 +107,8 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
           className={`relative bg-muted overflow-hidden flex items-center justify-center ${
             fullscreen ? "fixed inset-0 z-50 aspect-auto rounded-none" : "rounded-lg aspect-[8.5/11]"
           }`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
         >
           <div
             ref={imageRef}
