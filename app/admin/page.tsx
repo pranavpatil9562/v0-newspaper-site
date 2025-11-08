@@ -9,7 +9,7 @@ export default async function AdminPage() {
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
-    redirect("/auth/login")
+    redirect("/admin/login")
   }
 
   return <AdminPanel userId={data.user.id} />
