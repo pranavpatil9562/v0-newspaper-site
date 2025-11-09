@@ -142,12 +142,11 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-white">
+      <header className="border-b">
         <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-red-600">MANIKYADA MINCHU</h1>
-            <p className="text-lg font-semibold text-slate-700 mt-1">Admin Panel</p>
-            <p className="text-sm text-slate-500">Manage newspaper uploads</p>
+            <h1 className="text-3xl font-bold">MANIKYADA MINCHU Admin Panel</h1>
+            <p className="text-sm text-muted-foreground">Manage newspaper uploads</p>
           </div>
           <Button variant="outline" size="sm" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-2" />

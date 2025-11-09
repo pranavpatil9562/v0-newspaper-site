@@ -41,9 +41,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2 text-center mb-4">
-            <h1 className="text-4xl font-bold text-red-600">MANIKYADA MINCHU</h1>
-            <p className="text-slate-300 text-lg">Admin Portal</p>
-            <p className="text-slate-400 text-sm">Newspaper Management System</p>
+            <h1 className="text-3xl font-bold text-white">Admin Portal</h1>
+            <p className="text-slate-300">Newspaper Management System</p>
           </div>
 
           <Card className="border-slate-700 bg-slate-800">

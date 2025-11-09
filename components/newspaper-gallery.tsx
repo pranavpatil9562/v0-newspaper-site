@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ChevronDown, ChevronUp } from "lucide-react"
+
 
 interface NewspaperGalleryProps {
   images: string[]
@@ -23,6 +25,8 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
   const touchStartZoomRef = useRef(1)
   const dragStartRef = useRef({ x: 0, y: 0 })
   const isDraggingRef = useRef(false)
+  const [showTerms, setShowTerms] = useState(false)
+
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -40,6 +44,14 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
     setPanX(0)
     setPanY(0)
   }, [currentIndex])
+  // 👇 Add this useEffect
+useEffect(() => {
+  // Automatically scroll the newspaper area into view when the site loads
+  if (containerRef.current) {
+    containerRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+}, [])
+
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (zoom > 1) {
@@ -256,6 +268,8 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
             </>
           )}
         </div>
+      
+
 
         {!fullscreen && (
           <>
@@ -279,6 +293,7 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
               <Maximize2 className="w-4 h-4 mr-2" />
               Full Screen
             </Button>
+            
 
             <div className="flex gap-2 flex-wrap">
               {images.map((_, index) => (
@@ -294,6 +309,149 @@ export default function NewspaperGallery({ images }: NewspaperGalleryProps) {
                 </button>
               ))}
             </div>
+            {/* About + Latest Editions (tight layout, no gap) */}
+<div className="w-full border-t pt-4 md:pt-6">
+<div className="flex flex-col md:flex-row justify-between items-start md:items-stretch md:gap-0 gap-4">
+
+    
+    {/* About */}
+<div className="w-full md:w-1/2 px-2 md:px-3 flex flex-col justify-center">
+
+      <h3 className="text-base md:text-lg font-bold text-foreground mb-1">
+        ಮಾನಿಕ್ಯದ ಮಿಂಚು | MANIKYADA MINCHU
+      </h3>
+      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+        ಕನ್ನಡಿಗರ ಕನ್ನಡ ದಿನಪತ್ರಿಕೆ — ಬೀದರದಿಂದ ಪ್ರಕಟವಾಗುವ 
+        <strong> ಮಾನಿಕ್ಯದ ಮಿಂಚು </strong> ಸ್ಥಳೀಯ, ರಾಜ್ಯ, ರಾಷ್ಟ್ರೀಯ ಹಾಗೂ ಅಂತರರಾಷ್ಟ್ರೀಯ 
+        ಸುದ್ದಿಗಳನ್ನು ನಿಖರವಾಗಿ ಹಾಗೂ ಪ್ರಾಮಾಣಿಕವಾಗಿ ತಲುಪಿಸುವ ಪ್ರಯತ್ನದಲ್ಲಿದೆ. ರಾಜಕೀಯ, 
+        ವ್ಯಾಪಾರ, ಕ್ರೀಡೆ, ಶಿಕ್ಷಣ ಹಾಗೂ ಸಮಾಜಮುಖಿ ವಿಷಯಗಳಲ್ಲಿ ನಿಖರವಾದ ವರದಿ ನೀಡುವ ಪತ್ರಿಕೆ.
+      </p>
+      <p className="text-xs text-muted-foreground mt-1">
+        Honest. Local. Trusted Journalism.
+      </p>
+    </div>
+
+    {/* Latest Editions */}
+<div className="w-full md:w-1/2 px-2 md:px-3 flex flex-col justify-center">
+
+<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 md:mb-4">
+  <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-0">
+    Latest Editions
+  </h3>
+</div>
+
+      <ul className="space-y-0.5 text-xs md:text-sm text-muted-foreground">
+        {Array.from({ length: 7 }).map((_, i) => {
+          const date = new Date()
+          date.setDate(date.getDate() - i)
+          const formattedDate = date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
+          return (
+            <li
+              key={i}
+              className="cursor-pointer hover:text-primary transition-colors"
+              onClick={() =>
+                (window.location.href = `/newspaper/${date.toISOString().split("T")[0]}`)
+              }
+            >
+              {formattedDate}
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+
+              {/* ✅ Terms & Conditions Toggle (English + Kannada) */}
+<div className="max-w-4xl mx-auto mt-6 w-full">
+  <button
+    onClick={() => setShowTerms(!showTerms)}
+    className="flex items-center justify-between w-full bg-foreground/5 hover:bg-foreground/10 transition-colors px-4 py-3 rounded-lg font-semibold text-foreground"
+  >
+    <span>📜 Terms & Conditions / ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು</span>
+    {showTerms ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+  </button>
+
+  <div
+    className={`transition-all duration-500 ease-in-out overflow-hidden ${
+      showTerms ? "max-h-[600px] opacity-100 mt-3" : "max-h-0 opacity-0"
+    }`}
+  >
+    <div className="bg-background border border-foreground/10 rounded-lg shadow-sm p-4 text-sm text-foreground/80 leading-relaxed">
+      <p className="font-semibold mb-2 text-lg text-center">
+        🗞️ MANIKYADA MINCHU — Terms & Conditions
+      </p>
+
+      {/* English Version */}
+      <div className="space-y-2">
+        <p>
+          1. All news and information published in <strong>MANIKYADA MINCHU</strong> are for public
+          awareness and informational purposes only.
+        </p>
+        <p>
+          2. The publication is owned and managed by <strong>Manikesh Patil</strong>.
+        </p>
+        <p>
+          3. Reproduction or distribution of any content without prior written permission from the
+          owner is strictly prohibited.
+        </p>
+        <p>
+          4. While every effort is made to ensure the accuracy of information, <strong>MANIKYADA
+          MINCHU</strong> is not responsible for any inadvertent errors or omissions.
+        </p>
+        <p>
+          5. The views expressed by contributors or advertisers are their own and do not necessarily
+          reflect those of <strong>MANIKYADA MINCHU</strong>.
+        </p>
+        <p>
+          6. By accessing or reading this newspaper, you agree to these terms.
+        </p>
+      </div>
+
+      <hr className="my-4 border-foreground/10" />
+
+      {/* Kannada Version */}
+      <div className="space-y-2 font-[Kannada] text-[15px] leading-relaxed">
+        <p className="font-semibold mb-1">🗞️ ಮಾನಿಕ್ಯದ ಮಿಂಚು — ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು</p>
+        <p>
+          ೧. <strong>ಮಾನಿಕ್ಯದ ಮಿಂಚು</strong> ಪತ್ರಿಕೆಯಲ್ಲಿ ಪ್ರಕಟವಾಗುವ ಎಲ್ಲಾ ಸುದ್ದಿ ಮತ್ತು ಮಾಹಿತಿಗಳು
+          ಸಾರ್ವಜನಿಕ ಜಾಗೃತಿ ಮತ್ತು ಮಾಹಿತಿಗಾಗಿ ಮಾತ್ರ.
+        </p>
+        <p>
+          ೨. ಈ ಪತ್ರಿಕೆಯ ಮಾಲೀಕರು ಮತ್ತು ನಿರ್ವಹಣಾಧಿಕಾರಿ <strong>ಮನಿಕೇಶ್ ಪಾಟೀಲ</strong>.
+        </p>
+        <p>
+          ೩. ಮಾಲೀಕರ ಪೂರ್ವಾನುಮತಿಯಿಲ್ಲದೆ ಯಾವುದೇ ವಿಷಯವನ್ನು ನಕಲು ಮಾಡುವುದು ಅಥವಾ ಹಂಚಿಕೊಳ್ಳುವುದು
+          ಕಾನೂನುಬಾಹಿರ.
+        </p>
+        <p>
+          ೪. ಪತ್ರಿಕೆಯಲ್ಲಿ ಪ್ರಕಟವಾಗುವ ಮಾಹಿತಿಯ ನಿಖರತೆಯ ಬಗ್ಗೆ ಎಲ್ಲಾ ಪ್ರಯತ್ನಗಳನ್ನೂ ಮಾಡಲಾಗುತ್ತದೆ,
+          ಆದಾಗ್ಯೂ <strong>ಮಾನಿಕ್ಯದ ಮಿಂಚು</strong> ಯಾವುದೇ ತಪ್ಪುಗಳು ಅಥವಾ ಬಿಟ್ಟಿರುವ ವಿಷಯಗಳಿಗಾಗಿ
+          ಹೊಣೆಗಾರರಾಗಿರುವುದಿಲ್ಲ.
+        </p>
+        <p>
+          ೫. ಲೇಖಕರು ಅಥವಾ ಜಾಹೀರಾತು ದಾರರು ವ್ಯಕ್ತಪಡಿಸುವ ಅಭಿಪ್ರಾಯಗಳು ಅವರದೇ ಆಗಿದ್ದು,
+          <strong>ಮಾನಿಕ್ಯದ ಮಿಂಚು</strong> ಪತ್ರಿಕೆಯ ನಿಲುವನ್ನು ಪ್ರತಿಬಿಂಬಿಸುವುದಿಲ್ಲ.
+        </p>
+        <p>
+          ೬. ಈ ಪತ್ರಿಕೆಯನ್ನು ಓದುವ ಅಥವಾ ಪ್ರವೇಶಿಸುವ ಮೂಲಕ ನೀವು ಈ ಷರತ್ತುಗಳಿಗೆ ಒಪ್ಪುತ್ತೀರಿ.
+        </p>
+      </div>
+
+      <p className="mt-4 text-right text-xs italic text-foreground/60">
+        © {new Date().getFullYear()} MANIKYADA MINCHU | All Rights Reserved
+      </p>
+    </div>
+  </div>
+</div>
+
           </>
         )}
       </div>

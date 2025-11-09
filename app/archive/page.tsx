@@ -3,6 +3,7 @@ import { getArchiveNewspapers } from "@/lib/supabase/newspapers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "lucide-react"
 
+
 export const revalidate = 3600 // Revalidate every hour
 
 export default async function ArchivePage() {
