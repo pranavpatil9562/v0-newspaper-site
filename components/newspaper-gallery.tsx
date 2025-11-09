@@ -309,38 +309,18 @@ useEffect(() => {
                 </button>
               ))}
             </div>
-            {/* About + Latest Editions (tight layout, no gap) */}
-<div className="w-full border-t pt-4 md:pt-6">
-<div className="flex flex-col md:flex-row justify-between items-start md:items-stretch md:gap-0 gap-4">
+{/* About + Latest Editions (tight layout, no gap) */}
+<div className="w-full border-t pt-4 md:pt-6 bg-[#F2F2F2] rounded-lg px-3 md:px-4 py-6">
+  
+  <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-10 text-center">
 
-    
-    {/* About */}
-<div className="w-full md:w-1/2 px-2 md:px-3 flex flex-col justify-center">
-
-      <h3 className="text-base md:text-lg font-bold text-foreground mb-1">
-        ಮಾನಿಕ್ಯದ ಮಿಂಚು | MANIKYADA MINCHU
+    {/* LATEST EDITIONS */}
+    <div className="w-full md:w-[25%] flex flex-col items-center justify-center">
+      <h3 className="text-base md:text-lg font-semibold mb-3 text-black">
+        Latest Editions
       </h3>
-      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
-        ಕನ್ನಡಿಗರ ಕನ್ನಡ ದಿನಪತ್ರಿಕೆ — ಬೀದರದಿಂದ ಪ್ರಕಟವಾಗುವ 
-        <strong> ಮಾನಿಕ್ಯದ ಮಿಂಚು </strong> ಸ್ಥಳೀಯ, ರಾಜ್ಯ, ರಾಷ್ಟ್ರೀಯ ಹಾಗೂ ಅಂತರರಾಷ್ಟ್ರೀಯ 
-        ಸುದ್ದಿಗಳನ್ನು ನಿಖರವಾಗಿ ಹಾಗೂ ಪ್ರಾಮಾಣಿಕವಾಗಿ ತಲುಪಿಸುವ ಪ್ರಯತ್ನದಲ್ಲಿದೆ. ರಾಜಕೀಯ, 
-        ವ್ಯಾಪಾರ, ಕ್ರೀಡೆ, ಶಿಕ್ಷಣ ಹಾಗೂ ಸಮಾಜಮುಖಿ ವಿಷಯಗಳಲ್ಲಿ ನಿಖರವಾದ ವರದಿ ನೀಡುವ ಪತ್ರಿಕೆ.
-      </p>
-      <p className="text-xs text-muted-foreground mt-1">
-        Honest. Local. Trusted Journalism.
-      </p>
-    </div>
 
-    {/* Latest Editions */}
-<div className="w-full md:w-1/2 px-2 md:px-3 flex flex-col justify-center">
-
-<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 md:mb-4">
-  <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-0">
-    Latest Editions
-  </h3>
-</div>
-
-      <ul className="space-y-0.5 text-xs md:text-sm text-muted-foreground">
+      <ul className="space-y-1 text-sm md:text-base text-yellow-500 font-bold">
         {Array.from({ length: 7 }).map((_, i) => {
           const date = new Date()
           date.setDate(date.getDate() - i)
@@ -352,7 +332,7 @@ useEffect(() => {
           return (
             <li
               key={i}
-              className="cursor-pointer hover:text-primary transition-colors"
+              className="cursor-pointer hover:text-black active:scale-[1.05] transition-all duration-200"
               onClick={() =>
                 (window.location.href = `/newspaper/${date.toISOString().split("T")[0]}`)
               }
@@ -363,8 +343,43 @@ useEffect(() => {
         })}
       </ul>
     </div>
+
+    {/* ADDRESS */}
+    <div className="w-full md:w-[25%] flex flex-col items-center justify-center">
+      <h2 className="text-xl md:text-2xl font-extrabold text-red-600 leading-tight">
+        ಮಾನಿಕ್ಯದ ಮಿಂಚು
+      </h2>
+      <h2 className="text-xs md:text-sm font-bold text-red-600 tracking-wide mt-1">
+        MANIKYADA MINCHU
+      </h2>
+
+      <div className="mt-3 text-xs md:text-sm text-gray-700 leading-relaxed">
+        <p>BIDAR - Karnataka</p>
+        <p>+91 9590581555 - +91 9886852358</p>
+        <p>manikyadaminchu@gmail.com</p>
+        <p>manikeshp@gmail.com</p>
+      </div>
+    </div>
+
+    {/* ABOUT */}
+    <div className="w-full md:w-[50%] flex flex-col items-center justify-center">
+      <h3 className="text-base md:text-lg font-bold text-black mb-1">
+        ಮಾನಿಕ್ಯದ ಮಿಂಚು | MANIKYADA MINCHU
+      </h3>
+      <p className="text-sm md:text-base text-gray-700 leading-relaxed max-w-xl">
+        ಕನ್ನಡಿಗರ ಕನ್ನಡ ದಿನಪತ್ರಿಕೆ — ಬೀದರದಿಂದ ಪ್ರಕಟವಾಗುವ 
+        <strong> ಮಾನಿಕ್ಯದ ಮಿಂಚು </strong> ಸ್ಥಳೀಯ, ರಾಜ್ಯ, ರಾಷ್ಟ್ರೀಯ ಹಾಗೂ ಅಂತರರಾಷ್ಟ್ರೀಯ 
+        ಸುದ್ದಿಗಳನ್ನು ನಿಖರವಾಗಿ ಹಾಗೂ ಪ್ರಾಮಾಣಿಕವಾಗಿ ತಲುಪಿಸುವ ಪ್ರಯತ್ನದಲ್ಲಿದೆ. ರಾಜಕೀಯ, 
+        ವ್ಯಾಪಾರ, ಕ್ರೀಡೆ, ಶಿಕ್ಷಣ ಹಾಗೂ ಸಮಾಜಮುಖಿ ವಿಷಯಗಳಲ್ಲಿ ನಿಖರವಾದ ವರದಿ ನೀಡುವ ಪತ್ರಿಕೆ.
+      </p>
+      <p className="text-sm text-gray-700 mt-1">
+        Honest. Local. Trusted Journalism.
+      </p>
+    </div>
+
   </div>
 </div>
+
 
 
 
