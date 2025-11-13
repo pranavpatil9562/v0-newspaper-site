@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Upload, X, LogOut } from "lucide-react"
+import { Upload, X, LogOut, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import FileUploadZone from "./file-upload-zone"
 
@@ -24,6 +24,9 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  const [deleteDate, setDeleteDate] = useState("")
+  const [deleting, setDeleting] = useState(false)
 
   const handleFilesSelected = useCallback((selectedFiles: File[]) => {
     setFiles((prev) => [...prev, ...selectedFiles])
@@ -66,26 +69,15 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
         const fileName = `${date}_${i + 1}_${Date.now()}.jpg`
         const path = `newspapers/${date}/${fileName}`
 
-        console.log("[v0] Uploading file:", { fileName, path, fileSize: file.size, fileType: file.type })
-
         const { data, error: uploadError } = await supabase.storage
           .from("newspapers")
           .upload(path, file, { upsert: false })
 
-        if (uploadError) {
-          console.log("[v0] Upload error details:", uploadError)
-          throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`)
-        }
+        if (uploadError) throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`)
 
-        console.log("[v0] File uploaded successfully:", data)
-
-        // Get public URL
         const { data: publicUrl } = supabase.storage.from("newspapers").getPublicUrl(data.path)
-
         imageUrls.push(publicUrl.publicUrl)
       }
-
-      console.log("[v0] All files uploaded, saving to database...")
 
       // Check if newspaper already exists for this date
       const { data: existingNewspaper, error: checkError } = await supabase
@@ -97,7 +89,6 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
       let dbError
       if (checkError?.code === "PGRST116") {
         // No existing newspaper, create new one
-        console.log("[v0] Creating new newspaper record")
         const { error } = await supabase.from("newspapers").insert({
           date,
           title,
@@ -106,7 +97,6 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
         dbError = error
       } else if (!checkError) {
         // Newspaper exists, append images
-        console.log("[v0] Updating existing newspaper record")
         const updatedUrls = [...(existingNewspaper.image_urls || []), ...imageUrls]
         const { error } = await supabase
           .from("newspapers")
@@ -117,26 +107,51 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
           .eq("date", date)
         dbError = error
       } else {
-        console.log("[v0] Database check error:", checkError)
         throw checkError
       }
 
-      if (dbError) {
-        console.log("[v0] Database error:", dbError)
-        throw dbError
-      }
+      if (dbError) throw dbError
 
-      console.log("[v0] Upload successful!")
       setSuccess(`Successfully uploaded ${files.length} image(s) for ${date}`)
       setTitle("")
       setDate(new Date().toISOString().split("T")[0])
       setFiles([])
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred"
-      console.log("[v0] Final error:", errorMessage)
-      setError(errorMessage)
+      setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deleteDate) {
+      alert("Please enter a date to delete (YYYY-MM-DD)")
+      return
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete the newspaper for ${deleteDate}?`)
+    if (!confirmDelete) return
+
+    setDeleting(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const supabase = createClient()
+
+      // Delete from database
+      const { error: dbError } = await supabase.from("newspapers").delete().eq("date", deleteDate)
+      if (dbError) throw dbError
+
+      // Optional: delete from storage (entire folder)
+      await supabase.storage.from("newspapers").remove([`newspapers/${deleteDate}`])
+
+      setSuccess(`Newspaper for ${deleteDate} deleted successfully`)
+      setDeleteDate("")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to delete newspaper")
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -155,7 +170,8 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-6 py-12 space-y-10">
+        {/* Upload Section */}
         <Card>
           <CardHeader>
             <CardTitle>Upload Newspaper Pages</CardTitle>
@@ -221,6 +237,39 @@ export default function AdminPanel({ userId }: AdminPanelProps) {
                   : `Upload ${files.length} Image${files.length !== 1 ? "s" : ""}`}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Delete Section */}
+        <Card className="border-destructive/20">
+          <CardHeader>
+            <CardTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Delete Newspaper
+            </CardTitle>
+            <CardDescription>Remove a newspaper record and its images by date</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 items-end">
+              <div className="grid gap-2">
+                <Label htmlFor="deleteDate">Publication Date</Label>
+                <Input
+                  id="deleteDate"
+                  type="date"
+                  value={deleteDate}
+                  onChange={(e) => setDeleteDate(e.target.value)}
+                />
+              </div>
+              <Button
+                variant="destructive"
+                disabled={deleting || !deleteDate}
+                onClick={handleDelete}
+                className="w-full md:w-auto"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {deleting ? "Deleting..." : "Delete Newspaper"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </main>
